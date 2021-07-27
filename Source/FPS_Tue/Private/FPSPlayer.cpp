@@ -6,6 +6,8 @@
 #include <Camera/CameraComponent.h>
 #include <Components/CapsuleComponent.h>
 #include <Components/SkeletalMeshComponent.h>
+#include "PlayerMove.h"
+#include "PlayerFire.h"
 
 // Sets default values
 AFPSPlayer::AFPSPlayer()
@@ -23,8 +25,10 @@ AFPSPlayer::AFPSPlayer()
 	bodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
 	bodyMesh->SetupAttachment(fpsCamera);
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>tempMesh(TEXT("SkeletalMesh'/Game/FirstPerson/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'"));
+	playerMove = CreateDefaultSubobject<UPlayerMove>(TEXT("PlayerMove"));
+	playerFire = CreateDefaultSubobject<UPlayerFire>(TEXT("PlayerFire"));
 
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>tempMesh(TEXT("SkeletalMesh'/Game/FirstPerson/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'"));
 	if (tempMesh.Succeeded())
 	{
 		bodyMesh->SetSkeletalMesh(tempMesh.Object);
@@ -50,6 +54,10 @@ void AFPSPlayer::Tick(float DeltaTime)
 void AFPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	OnInputDelegate.Broadcast(PlayerInputComponent);
+
+	playerMove->SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
