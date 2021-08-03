@@ -58,6 +58,7 @@ void AFPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	OnInputDelegate.Broadcast(PlayerInputComponent);
 
 	playerMove->SetupPlayerInputComponent(PlayerInputComponent);
+	//playerFire->SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 

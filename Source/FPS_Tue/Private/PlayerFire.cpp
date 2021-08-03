@@ -5,6 +5,8 @@
 #include "FPSPlayer.h"
 #include <Components/ArrowComponent.h>
 #include "Bullet.h"
+#include "Enemy.h"
+#include "EnemyFSM.h"
 #include <Kismet/GameplayStatics.h>
 #include <Camera/CameraComponent.h>
 
@@ -75,7 +77,7 @@ void UPlayerFire::Fire()
 	
 	FCollisionQueryParams param;
 	param.AddIgnoredActor(me);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, start, end, ECC_Visibility, param);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, start, end, ECC_Pawn, param);
 
 	if (bHit)
 	{
@@ -84,11 +86,12 @@ void UPlayerFire::Fire()
 		
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletEffect, trans);
 
-		// 부딪힌 물체가 Cube 라면 날려버리고 싶다.
-		if (hitinfo.GetActor()->GetName().Contains(TEXT("Cube")))
+		auto enemy = Cast<AEnemy>(hitinfo.GetActor());
+
+		if (enemy)
 		{
-			auto comp = hitinfo.GetComponent();
-			comp->AddForceAtLocation(-hitinfo.ImpactNormal * bulletPower * comp->GetMass(), hitinfo.ImpactPoint);
+			// Enemy의 상태를 Damage로 전환한다.
+			enemy->enemyFSM->OnDamageProcess(fpsCam->GetForwardVector());
 		}
 	}
 }
